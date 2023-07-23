@@ -1,57 +1,99 @@
-import React, {useEffect,useState} from 'react'
+import { useState, useEffect } from 'react';
+import axios from 'axios';
+import './App.css';
 
 function App() {
-  const [transactions, setTransactions] = useState([])
-  const [search, setSearch] = useState('')
-  const [filteredTransactions, setFilteredTransactions] = useState([])
-  const [sortType, setSortType] = useState('asc')
-  
-const handleSubmit = (e) => {
-  e.preventDefault()
-  const newTransaction = {
-    id: Math.floor(Math.random() * 10000),
-    date: e.target.date.value,
-    description: e.target.description.value,
-    category: e.target.category.value,
-    amount: e.target.amount.value
-  }
-  setTransactions([...transactions, newTransaction])
-  e.target.reset()
-}
-
+  const [transactions, setTransactions] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
-  fetch('http://localhost:8001/transactions')
-  .then(response => response.json())
-  .then(data => console.log(data))
-  .catch (error => console.log(error))
-  }, [])
+    fetchTransactions();
+  }, []);
+
+  const fetchTransactions = async () => {
+    try {
+      const response = await axios.get('http://localhost:8001/transactions');
+      setTransactions(response.data);
+    } catch (error) {
+      console.error('Error fetching transactions:', error);
+    }
+  };
+
+  const handleFormSubmit = async (event) => {
+    event.preventDefault();
+    const form = event.target;
+    const newTransaction = {
+      date: form.date.value,
+      description: form.description.value,
+      category: form.category.value,
+      amount: parseFloat(form.amount.value),
+    };
+
+    try {
+      await axios.post('http://localhost:8001/transactions', newTransaction);
+      fetchTransactions();
+    } catch (error) {
+      console.error('Error adding transaction:', error);
+    }
+
+    form.reset();
+  };
+
+  const handleSearch = (event) => {
+    setSearchTerm(event.target.value.toLowerCase());
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      await axios.delete(`http://localhost:8001/transactions/${id}`);
+      fetchTransactions();
+    } catch (error) {
+      console.error('Error deleting transaction:', error);
+    }
+  };
+
+  // filter each transaction
+  let filteredTransactions = [];
+  if (transactions) {
+    filteredTransactions = transactions.filter(
+      (transaction) =>
+        transaction.description.toLowerCase().includes(searchTerm) ||
+        transaction.category.toLowerCase().includes(searchTerm)
+    );
+  }
 
   return (
-    <div>
-        <form onSubmit={handleSubmit} >
-           <input value={transactions.id } onChange={(e)=>{setTransactions(e.target.value)}} type="number" id="" />
-           <input value={transactions.date } onChange={(e)=>{setTransactions(e.target.value)}}type="text"  id="date" />
-           <input value={transactions.description } onChange={(e)=>{setTransactions(e.target.value)}}type="text" id ="description" />
-           <input value={transactions.category} onChange={(e)=>{setTransactions(e.target.value)}} type="text" id="category" />
-           <input value={transactions.amount } onChange={(e)=>{setTransactions(e.target.value)}}type="number" id ="amount" />
-           <button type="submit">Submit</button>
-        </form>
-           <h2> search transaction</h2>
-           <input type="text" id="search" />
-        {/* <ol> {transactions.map(transaction => (
+    <div className='app-container'>
+      <h2>Add Transaction</h2>
+      <form onSubmit={handleFormSubmit}>
+        <input type="date" name="date" placeholder="Date" />
+        <input type="text" name="description" placeholder="Description" />
+        <input type="text" name="category" placeholder="Category" />
+        <input type="number" name="amount" placeholder="Amount" />
+        <button type="submit">ADD TRANSACTION</button>
+      </form>
+      <h2>Search Transactions</h2>
+      <input type="text" placeholder="Search for transactions ..." onChange={handleSearch} />
+
+      <h2>All Transactions</h2>
+      <ol className="transaction-details">
+        {filteredTransactions.length === 0 ? (
+          <li>No transactions to display.</li>
+        ) : (
+          filteredTransactions.map((transaction) => (
             <li key={transaction.id}>
-                <span id="id"> {transaction.id} </span>
-                <span id="date"> {transaction.date} </span>
-                <span id ="description"> {transaction.description} </span>
-                <span id ="category"> {transaction.category}</span>
-                <span id ="amount"> {transaction.amount}</span>
+              <div className='transactions-list'>
+                <span className='item'>{transaction.description}</span>
+                <span className='item'>{transaction.category}</span>
+                <span className='item'>{transaction.amount}</span>
+                <button onClick={() => handleDelete(transaction.id)}>Delete</button>
+              </div>
             </li>
-        ))}
-          
-        </ol> */}
+          ))
+        )}
+      </ol>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
