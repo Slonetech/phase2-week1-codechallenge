@@ -8,8 +8,8 @@ function App() {
 
   useEffect(() => {
     fetchTransactions();
-  }, []);
-
+  }, []); 
+//  **the fetchTransactions function is used to fetch the transactions from the server.**//
   const fetchTransactions = async () => {
     try {
       const response = await axios.get('http://localhost:8001/transactions');
@@ -18,7 +18,8 @@ function App() {
       console.error('Error fetching transactions:', error);
     }
   };
-
+//  **the  handleFormSubmit is used to handle the form submission by creating a new transaction object
+//  object, and sending a POST request to the server and then resetting the form.**//
   const handleFormSubmit = async (event) => {
     event.preventDefault();
     const form = event.target;
@@ -28,7 +29,9 @@ function App() {
       category: form.category.value,
       amount: parseFloat(form.amount.value),
     };
-
+// the code block is handling the form submission -creats a new transaction value 
+// -enters the form, sends a POST request to the server and add the new transaction 
+// and fetches the updated list .//
     try {
       await axios.post('http://localhost:8001/transactions', newTransaction);
       fetchTransactions();
@@ -42,7 +45,7 @@ function App() {
   const handleSearch = (event) => {
     setSearchTerm(event.target.value.toLowerCase());
   };
-
+// handleDelete is used to delete a transaction by id and then fetches the updated list.//
   const handleDelete = async (id) => {
     try {
       await axios.delete(`http://localhost:8001/transactions/${id}`);
@@ -61,7 +64,7 @@ function App() {
         transaction.category.toLowerCase().includes(searchTerm)
     );
   }
-
+//  **the code block is used to display the transactions in a list.**//
   return (
     <div className='app-container'>
       <h2>Add Transaction</h2>
