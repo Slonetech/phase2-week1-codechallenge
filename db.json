@@ -1,20 +1,6 @@
 {
   "transactions": [
     {
-      "id": 6,
-      "date": "2019-12-06",
-      "description": "Chipotle",
-      "category": "Food",
-      "amount": -17.59
-    },
-    {
-      "id": 7,
-      "date": "2019-12-07",
-      "description": "Birthday Check from Grandma",
-      "category": "Gift",
-      "amount": 50
-    },
-    {
       "id": 8,
       "date": "2019-12-09",
       "description": "Lyft Ride",
