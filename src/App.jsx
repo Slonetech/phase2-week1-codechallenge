@@ -18,8 +18,8 @@ function App() {
       console.error('Error fetching transactions:', error);
     }
   };
-//  **the  handleFormSubmit is used to handle the form submission by creating a new transaction object
-//  object, and sending a POST request to the server and then resetting the form.**//
+//  **the  handleFormSubmit - handle the form submission by creating a new transaction object
+//  , sending a POST request to the server,adds the new transaction and fetches the updated list.**//
   const handleFormSubmit = async (event) => {
     event.preventDefault();
     const form = event.target;
@@ -29,9 +29,8 @@ function App() {
       category: form.category.value,
       amount: parseFloat(form.amount.value),
     };
-// the code block is handling the form submission -creats a new transaction value 
-// -enters the form, sends a POST request to the server and add the new transaction 
-// and fetches the updated list .//
+// axios allows you to set default header intercept request and respond whereas
+//  fetch has a simpler API that lacks some of these feature requiring add libs
     try {
       await axios.post('http://localhost:8001/transactions', newTransaction);
       fetchTransactions();
@@ -41,6 +40,7 @@ function App() {
 
     form.reset();
   };
+
 
   const handleSearch = (event) => {
     setSearchTerm(event.target.value.toLowerCase());
